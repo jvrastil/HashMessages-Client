@@ -9,7 +9,18 @@ export class ApiInterceptor implements HttpInterceptor {
   }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    const apiReq = req.clone({ url: `${this.baseUrl}/${req.url}` });
+    // handles absolute http requests
+    if (req.url.includes('http')) {
+      return next.handle(req);
+    }
+
+    // handles requests for assets
+    if (req.url.includes('assets')) {
+      return next.handle(req);
+    }
+
+    // handles entity requests to remote API
+    const apiReq = req.clone({url: `${this.baseUrl}/${req.url}`});
     return next.handle(apiReq);
   }
 }
