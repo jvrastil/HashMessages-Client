@@ -1,16 +1,16 @@
-import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { HTTP_INTERCEPTORS, HttpClient, HttpClientModule } from '@angular/common/http';
-import { RouterModule } from '@angular/router';
-import { MatButtonModule, MatCardModule, MatFormFieldModule, MatInputModule } from '@angular/material';
+import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { RouterModule } from '@angular/router';
 
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
-
 import { AdsenseModule } from 'ng2-adsense';
 
 import { ApiInterceptor } from './services/apiInterceptor/api-interceptor';
+
+import { MaterialModule } from './modules/material.module';
 
 import { AppComponent } from './app.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
@@ -18,6 +18,8 @@ import { NewMessageComponent } from './components/new-message/new-message.compon
 
 import { environment } from '../environments/environment';
 import { appRoutes } from './app.routes';
+import { ReactiveFormsModule } from '@angular/forms';
+
 
 @NgModule({
   declarations: [
@@ -33,8 +35,7 @@ import { appRoutes } from './app.routes';
     BrowserModule,
     BrowserAnimationsModule,
     HttpClientModule,
-    MatButtonModule,
-    MatInputModule,
+    MaterialModule,
     RouterModule.forRoot(appRoutes, {useHash: true}),
     TranslateModule.forRoot({
       loader: {
@@ -43,8 +44,7 @@ import { appRoutes } from './app.routes';
         deps: [HttpClient],
       },
     }),
-    MatCardModule,
-    MatFormFieldModule,
+    ReactiveFormsModule,
   ],
   providers: [
     {

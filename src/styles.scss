@@ -1,1 +1,25 @@
-@import "~@angular/material/prebuilt-themes/pink-bluegrey.css";
+@import '~@angular/material/theming';
+@import url("https://fonts.googleapis.com/icon?family=Material+Icons");
+
+@include mat-core();
+$solution-app-primary: mat-palette($mat-indigo);
+$solution-app-accent:  mat-palette($mat-pink, A200, A100, A400);
+$solution-app-warn:    mat-palette($mat-red);
+
+$solution-app-theme: mat-light-theme($solution-app-primary, $solution-app-accent, $solution-app-warn);
+
+@include angular-material-theme($solution-app-theme);
+
+$solution-app-dark-primary: mat-palette($mat-pink);
+$solution-app-dark-accent:  mat-palette($mat-grey, A200, A100, A400);
+$solution-app-dark-warn:    mat-palette($mat-red);
+$solution-app-dark-theme: mat-dark-theme($solution-app-dark-primary, $solution-app-dark-accent, $solution-app-dark-warn);
+.solution-dark-theme {
+  @include angular-material-theme($solution-app-dark-theme);
+}
+
+::ng-deep {
+  mat-icon {
+    font-family: 'Material Icons' !important;
+  }
+}
