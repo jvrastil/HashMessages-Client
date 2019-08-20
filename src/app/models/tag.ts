@@ -1,4 +1,9 @@
 export class Tag {
-  tagName: string;
+  name: string;
   uuid: string;
+
+  constructor(name: string) {
+    this.name = name;
+    this.uuid = null;
+  }
 }

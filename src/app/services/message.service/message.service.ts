@@ -16,8 +16,6 @@ export class MessageService {
   }
 
   postNewMessage(msg: Message): Promise<Message> {
-    return this.http.post<Message>(this.newMessageUrl, {
-      body: JSON.stringify(msg)
-    }).toPromise();
+    return this.http.post<Message>(this.newMessageUrl, msg).toPromise();
   }
 }

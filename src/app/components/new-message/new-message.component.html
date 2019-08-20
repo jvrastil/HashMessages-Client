@@ -28,8 +28,8 @@
             formArrayName="tags"
             [selectable]="selectable"
             [removable]="removable"
-            (removed)="remove(tag)">
-            {{tag}}
+            (removed)="remove(tag.uuid)">
+            {{ tag.name }}
             <mat-icon matChipRemove class="clear-icon">clear</mat-icon>
           </mat-chip>
           <input
@@ -43,7 +43,7 @@
         </mat-chip-list>
         <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
           <mat-option *ngFor="let tag of suggestedTags$ | async" [value]="tag">
-            {{tag}}
+            {{ tag.name }}
           </mat-option>
         </mat-autocomplete>
       </mat-form-field>

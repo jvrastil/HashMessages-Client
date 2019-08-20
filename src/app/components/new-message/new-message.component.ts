@@ -33,7 +33,7 @@ export class NewMessageComponent implements OnInit {
   separatorKeysCodes: number[] = [ENTER, COMMA];
   filteredTags: Observable<string[]>;
   suggestedTags$: Observable<Tag[]>;
-  newMessageTags: string[] = [];
+  newMessageTags: Tag[] = [];
   message = new Message();
 
   formGroup: FormGroup;
@@ -55,7 +55,7 @@ export class NewMessageComponent implements OnInit {
     });
   }
 
-  add(event: MatChipInputEvent): void {
+  async add(event: MatChipInputEvent): Promise<void> {
     // Add tag only when MatAutocomplete is not open
     // To make sure this does not conflict with OptionSelected Event
     if (!this.matAutocomplete.isOpen) {
@@ -64,16 +64,16 @@ export class NewMessageComponent implements OnInit {
 
       // Add our tag
       if ((value || '').trim()) {
-        this.newMessageTags.push(value.trim());
+        const newTag = await this.tagService.addNewTag(new Tag(value.trim()));
+        this.newMessageTags.push(newTag);
         this.formGroup.controls.tags.setValue([...this.newMessageTags]);
       }
 
       // Reset the input value
       if (input) {
         input.value = '';
+        this.formGroup.controls.tags.setValue([]);
       }
-
-      // this.formGroup.controls.tags.setValue([]);
     }
   }
 
@@ -86,8 +86,8 @@ export class NewMessageComponent implements OnInit {
     this.msgService.postNewMessage(newMsg);
   }
 
-  remove(tag: string): void {
-    const index = this.newMessageTags.indexOf(tag);
+  remove(uuid: string): void {
+    const index = this.newMessageTags.findIndex(tag => tag.uuid === uuid);
 
     if (index >= 0) {
       this.newMessageTags.splice(index, 1);
@@ -96,16 +96,15 @@ export class NewMessageComponent implements OnInit {
   }
 
   selected(event: MatAutocompleteSelectedEvent): void {
-    this.newMessageTags.push(event.option.viewValue);
+    this.newMessageTags.push(new Tag(event.option.viewValue));
     this.tagInput.nativeElement.value = '';
     this.formGroup.controls.tags.setValue([]);
   }
 
-  private _filter(value: string): string[] {
+  private _filter(value: string): Tag[] {
     const filterValue = value.toLowerCase();
 
-    return this.newMessageTags.filter(tag => tag.toLowerCase()
-      .indexOf(filterValue) === 0);
+    return this.newMessageTags.filter(tag => tag.name.toLowerCase().includes(filterValue));
   }
 
   private validateArrayNotEmpty(formControl: FormControl) {

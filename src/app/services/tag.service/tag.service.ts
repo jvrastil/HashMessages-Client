@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
 })
 export class TagService {
   private readonly newTagUrl = 'add-new-tag';
-  private readonly getTagsUrl = 'messages';
+  private readonly getTagsUrl = 'tags';
 
   constructor(private http: HttpClient) { }
 
@@ -17,6 +17,6 @@ export class TagService {
   }
 
   addNewTag(tag: Tag): Promise<Tag> {
-    return this.http.post<Tag>(this.newTagUrl, JSON.stringify(tag)).toPromise();
+    return this.http.post<Tag>(this.newTagUrl, tag).toPromise();
   }
 }
