@@ -55,7 +55,7 @@ export class NewMessageComponent implements OnInit {
     });
   }
 
-  async add(event: MatChipInputEvent): Promise<void> {
+  add(event: MatChipInputEvent): void {
     // Add tag only when MatAutocomplete is not open
     // To make sure this does not conflict with OptionSelected Event
     if (!this.matAutocomplete.isOpen) {
@@ -64,15 +64,16 @@ export class NewMessageComponent implements OnInit {
 
       // Add our tag
       if ((value || '').trim()) {
-        const newTag = await this.tagService.addNewTag(new Tag(value.trim()));
-        this.newMessageTags.push(newTag);
-        this.formGroup.controls.tags.setValue([...this.newMessageTags]);
+        this.tagService.addNewTag(new Tag(value.trim())).then(newTag => {
+          this.newMessageTags.push(newTag);
+          this.formGroup.controls.tags.setValue([...this.newMessageTags.map(tag => tag.uuid)]);
+        });
       }
 
       // Reset the input value
       if (input) {
         input.value = '';
-        this.formGroup.controls.tags.setValue([]);
+        // this.formGroup.controls.tags.setValue([]);
       }
     }
   }
@@ -96,15 +97,9 @@ export class NewMessageComponent implements OnInit {
   }
 
   selected(event: MatAutocompleteSelectedEvent): void {
-    this.newMessageTags.push(new Tag(event.option.viewValue));
+    this.newMessageTags.push(event.option.value);
     this.tagInput.nativeElement.value = '';
-    this.formGroup.controls.tags.setValue([]);
-  }
-
-  private _filter(value: string): Tag[] {
-    const filterValue = value.toLowerCase();
-
-    return this.newMessageTags.filter(tag => tag.name.toLowerCase().includes(filterValue));
+    this.formGroup.controls.tags.setValue([...this.newMessageTags.map(tag => tag.uuid)]);
   }
 
   private validateArrayNotEmpty(formControl: FormControl) {
