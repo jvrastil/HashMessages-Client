@@ -1,0 +1,13 @@
+{
+  "new-message": {
+    "card-title": "Publish new Message",
+    "message-body": "Type new Message",
+    "send-button": "Post",
+    "signature": "Signature",
+    "title": "Title"
+  },
+  "general": {
+    "cancel": "Cancel",
+    "add-tag": "Add Tag"
+  }
+}

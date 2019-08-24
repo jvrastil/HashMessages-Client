@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-root',
@@ -9,9 +9,7 @@ import { HttpClient } from '@angular/common/http';
 export class AppComponent {
   title = 'hash-messages-client';
 
-  constructor(private http: HttpClient) {
-    this.http.get('')
-      .toPromise()
-      .then(response => console.log(13, response));
+  constructor(private translate: TranslateService) {
+    translate.setDefaultLang('en');
   }
 }
