@@ -88,5 +88,9 @@
   },
   "rulesDirectory": [
     "codelyzer"
+  ],
+  "extends": [
+    "tslint:latest",
+    "tslint-config-prettier"
   ]
 }
