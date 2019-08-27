@@ -1,7 +1,8 @@
 export class Message {
   title = '';
   message = '';
-  hashed?: boolean;
-  tags?: string[];
+  encrypted?: boolean;
+  tags: string[];
   date?: Date;
+  hashedTitle?: string;
 }

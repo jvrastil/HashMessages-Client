@@ -1,5 +1,5 @@
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ErrorStateMatcher, MatAutocomplete, MatAutocompleteSelectedEvent, MatChipInputEvent } from '@angular/material';
 import { Observable } from 'rxjs';
 import { FormArray, FormBuilder, FormControl, FormGroup, FormGroupDirective, NgForm, Validators } from '@angular/forms';
@@ -7,6 +7,7 @@ import { Tag } from '../../models/tag';
 import { TagService } from '../../services/tag.service/tag.service';
 import { MessageService } from '../../services/message.service/message.service';
 import { Message } from '../../models/message';
+import * as CryptoJS from 'crypto-js';
 
 /** Error when invalid control is dirty, touched, or submitted. */
 export class MyErrorStateMatcher implements ErrorStateMatcher {
@@ -22,19 +23,17 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
   styleUrls: ['./new-message.component.scss'],
 })
 export class NewMessageComponent implements OnInit {
+  @ViewChild('tagInput', { static: false }) tagInput: ElementRef<HTMLInputElement>;
+  @ViewChild('auto', { static: false }) matAutocomplete: MatAutocomplete;
 
-  @ViewChild('tagInput', {static: false}) tagInput: ElementRef<HTMLInputElement>;
-  @ViewChild('auto', {static: false}) matAutocomplete: MatAutocomplete;
-
-  visible = true;
   selectable = true;
   removable = true;
   addOnBlur = true;
   separatorKeysCodes: number[] = [ENTER, COMMA];
-  filteredTags: Observable<string[]>;
   suggestedTags$: Observable<Tag[]>;
   newMessageTags: Tag[] = [];
-  message = new Message();
+  encrypted = false;
+  encryptionKey = '';
 
   formGroup: FormGroup;
   matcher = new MyErrorStateMatcher();
@@ -43,6 +42,7 @@ export class NewMessageComponent implements OnInit {
     private tagService: TagService,
     private msgService: MessageService,
     private fb: FormBuilder,
+    private cdRef: ChangeDetectorRef,
   ) {
     this.suggestedTags$ = this.tagService.getTags();
   }
@@ -51,7 +51,8 @@ export class NewMessageComponent implements OnInit {
     this.formGroup = this.fb.group({
       title: new FormControl('', [Validators.required]),
       body: new FormControl('', [Validators.required]),
-      tags: new FormControl([], this.validateArrayNotEmpty)
+      tags: new FormControl([], this.validateArrayNotEmpty),
+      encryptionKey: new FormControl(''),
     });
   }
 
@@ -64,16 +65,18 @@ export class NewMessageComponent implements OnInit {
 
       // Add our tag
       if ((value || '').trim()) {
-        this.tagService.addNewTag(new Tag(value.trim())).then(newTag => {
-          this.newMessageTags.push(newTag);
-          this.formGroup.controls.tags.setValue([...this.newMessageTags.map(tag => tag.uuid)]);
-        });
+        this.tagService
+          .addNewTag(new Tag(value.trim()))
+          .then(newTag => {
+            this.newMessageTags.push(newTag);
+            this.formGroup.controls.tags.setValue([...this.newMessageTags.map(tag => tag.uuid)]);
+          })
+          .catch(err => console.log('Unable to get new tag', err));
       }
 
       // Reset the input value
       if (input) {
         input.value = '';
-        // this.formGroup.controls.tags.setValue([]);
       }
     }
   }
@@ -83,8 +86,23 @@ export class NewMessageComponent implements OnInit {
       title: this.formGroup.controls.title.value,
       message: this.formGroup.controls.body.value,
       tags: this.formGroup.controls.tags.value,
+      encrypted: this.encrypted,
     };
+
+    if (this.encrypted && this.formGroup.controls.encryptionKey) {
+      // get hash of the title -> will be used lated for verification
+      const encryptionKey = this.formGroup.controls.encryptionKey.value;
+      const hashedTitle = this.msgService.getHashedTitle(newMsg.title, encryptionKey);
+
+      newMsg.message = this.msgService.encrypt(newMsg.message, hashedTitle, encryptionKey);
+      newMsg.hashedTitle = hashedTitle;
+    }
     this.msgService.postNewMessage(newMsg);
+  }
+
+  toggleEncryption() {
+    this.encrypted = !this.encrypted;
+    this.cdRef.detectChanges();
   }
 
   remove(uuid: string): void {
@@ -105,7 +123,7 @@ export class NewMessageComponent implements OnInit {
   private validateArrayNotEmpty(formControl: FormControl) {
     if (formControl.value && formControl.value.length === 0) {
       return {
-        validateArrayNotEmpty: {valid: false},
+        validateArrayNotEmpty: { valid: false },
       };
     }
     return null;

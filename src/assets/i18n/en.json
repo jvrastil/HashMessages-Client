@@ -4,7 +4,8 @@
     "message-body": "Type new Message",
     "send-button": "Post",
     "signature": "Signature",
-    "title": "Title"
+    "title": "Title",
+    "hash-message": "Hash Message"
   },
   "general": {
     "cancel": "Cancel",
