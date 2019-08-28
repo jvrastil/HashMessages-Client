@@ -19,14 +19,10 @@ import { NewMessageComponent } from './components/new-message/new-message.compon
 import { environment } from '../environments/environment';
 import { appRoutes } from './app.routes';
 import { ReactiveFormsModule } from '@angular/forms';
-
+import { LogoComponent } from './components/logo/logo.component';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    DashboardComponent,
-    NewMessageComponent
-  ],
+  declarations: [AppComponent, DashboardComponent, NewMessageComponent, LogoComponent],
   imports: [
     AdsenseModule.forRoot({
       adClient: 'ca-pub-7990836138695617',
@@ -36,7 +32,7 @@ import { ReactiveFormsModule } from '@angular/forms';
     BrowserAnimationsModule,
     HttpClientModule,
     MaterialModule,
-    RouterModule.forRoot(appRoutes, {useHash: true}),
+    RouterModule.forRoot(appRoutes, { useHash: true }),
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,
@@ -50,13 +46,13 @@ import { ReactiveFormsModule } from '@angular/forms';
     {
       provide: HTTP_INTERCEPTORS,
       useClass: ApiInterceptor,
-      multi: true
+      multi: true,
     },
-    { provide: 'BASE_API_URL', useValue: environment.apiUrl }
+    { provide: 'BASE_API_URL', useValue: environment.apiUrl },
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}
 
 // required for AOT compilation
 export function HttpLoaderFactory(http: HttpClient) {
